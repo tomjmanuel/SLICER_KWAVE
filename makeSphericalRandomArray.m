@@ -1,12 +1,12 @@
 %https://stackoverflow.com/questions/38997302/create-random-unit-vector-inside-a-defined-conical-region/39003745#39003745
 % generate points along spherical cap (random distribution)
 clear all
-R = 75; D = 75;
+R = 50; D = 50;
 height = R-sqrt(R^2-(D/2)^2);
 coneAngle  =  acos((R-height)/R);
 
 coneDir = [0 0 1];
-n=32;
+n=64;
 
 z = rand(n,1)*(1-cos(coneAngle)) + cos(coneAngle);
 phi = rand(n,1)*2*pi;
@@ -15,10 +15,10 @@ y = sqrt(1-z.^2).*sin(phi);
 
 x = R.*x; y=R.*y; z= R.*z;
 
-scatter3(x,y,z)
-axis equal
+% scatter3(x,y,z)
+% axis equal
 
-%% sweet now to adjust overlapping points
+% sweet now to adjust overlapping points
 
 % go one point at a time, check its closest neighbor if its closest
 % neighbor is less than a value away, try a new loc
@@ -36,6 +36,7 @@ for s=1:length(spacing)
                 if dist<=spacing(s)
                     tight = 1;
                     while(tight)
+                        tight2 = 0;
                         % get new xyz coords
                         zz = rand(1)*(1-cos(coneAngle)) + cos(coneAngle);
                         phi = rand(1)*2*pi;
@@ -43,22 +44,20 @@ for s=1:length(spacing)
                         y(i)= R*sqrt(1-zz.^2).*sin(phi);
                         z(i)=R*zz;
                         
-%                         uu = rand(); vv = .125*NA*rand();
-%                         thet = 2*pi*uu; phi = acos(2*vv-1);
-%                         x(i) = R.*sin(phi).*cos(thet);
-%                         y(i) = R.*sin(phi).*sin(thet);
-%                         z(i) = R.*cos(phi);
-                        %check again
+                        %compare new coords to all other elements
                         for j=1:n
                             if j==i
                             else
                                 dist= sqrt((x(i)-x(j)).^2+(y(i)-y(j)).^2+(z(i)-z(j)).^2);
+                            
                             end
+                            % if dist is smaller than spacing tolerance
+                            % make a note
                             if dist<=spacing(s)
-                                break
+                                tight2 = 1;
                             end
                         end
-                        if j==n
+                        if tight2==0
                             tight=0;
                         end
                     end
@@ -78,6 +77,6 @@ axis equal
 %% save
 z = -1.*(z-R);
 A = [x y z];
-save('transducer_32elem_R75_D75.mat','A');
+save('transducer_64elem_R50_D50.mat','A');
 
 
