@@ -1,5 +1,7 @@
 % Tom 4/22/20
 % script for running kwave using simspace setup by slicer
+% this script works with H101_makeNii but not for multielement arrays
+
 %% define inputs
 fnout = 'kwaveOutput';
 

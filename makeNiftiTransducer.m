@@ -4,13 +4,13 @@
 % after writing nifti, you must load it into slicer and adjust 
 %   voxel sizes
 
-load('transducer_64elem_R50_D50.mat')
+load('transducer_128elem_R100_D100.mat');
 
-radius_mm = 50;
+radius_mm = 100;
 diameter_mm = 5; %element diameter not transducer diameter
-nE = 64; % n elements
+nE = 128; % n elements
 
-usf = 8; % grid usf
+usf = 4; % grid usf
 padding = 10; % padding in all 3 dim
 zpaddingextra = 30; % optional extra z padding
 
@@ -39,10 +39,15 @@ A = round(A);
 
 %mark focus in bowls
 % make grid big enough to encomposs focus + padding
+bs=5; % size of spot at focus
+bowls(fL(1)-bs:fL(1)+bs,fL(2)-bs:fL(2)+bs,fL(3)-bs:fL(3)+bs)=200;
+bowls(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 
-
-bs=5;
-bowls(fL(1)-bs:fL(1)+bs,fL(2)-bs:fL(2)+bs,fL(3)-bs:fL(3)+bs)=1;
-
-niftiwrite(labels,'xdcr_64elem_R50_D50_vox125um_labeled.nii');
-niftiwrite(bowls,'xdcr_64elem_R50_D50_vox125um.nii');
+%% outputs
+% pixel coordinates to be used with timereversal
+save('xdcr_128elem_R100_D100_vox250um_pixcoords.mat','A');
+% labeled bowls
+niftiwrite(labels,'xdcr_128elem_R100_D100_vox250um_labeled.nii','compressed',true);
+% map with all sensor points marked 1, and focus labeled as 255, with
+% surrounding voxels labeled 200
+niftiwrite(bowls,'xdcr_128elem_R100_D100_vox250um.nii','compressed',true);

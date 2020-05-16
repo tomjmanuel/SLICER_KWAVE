@@ -1,12 +1,12 @@
 %https://stackoverflow.com/questions/38997302/create-random-unit-vector-inside-a-defined-conical-region/39003745#39003745
 % generate points along spherical cap (random distribution)
 clear all
-R = 50; D = 50;
+R = 100; D = 100;
 height = R-sqrt(R^2-(D/2)^2);
 coneAngle  =  acos((R-height)/R);
 
 coneDir = [0 0 1];
-n=64;
+n=128;
 
 z = rand(n,1)*(1-cos(coneAngle)) + cos(coneAngle);
 phi = rand(n,1)*2*pi;
@@ -77,6 +77,6 @@ axis equal
 %% save
 z = -1.*(z-R);
 A = [x y z];
-save('transducer_64elem_R50_D50.mat','A');
+save('transducer_128elem_R100_D100.mat','A');
 
 
