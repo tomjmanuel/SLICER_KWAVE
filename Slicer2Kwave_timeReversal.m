@@ -10,7 +10,7 @@
 clear all
 %% define inputs
 % .mat output holding pressure at sensor (vectorized)
-fnout = 'patsesnsor.mat';
+fnout = 'patsesnsorwater.mat';
 
 % ct filename 
 % CT that has been cropped and co-registered to xdcr mask in slicer
@@ -24,7 +24,7 @@ xdfn = 'xdcr_128elem_R100_D100_vox250um.nii.gz';
 % point to a .mat file with element coordinates
 elem_locs = load('xdcr_128elem_R100_D100_vox250um_pixcoords.mat');
 
-f0 = 0.5E6;                 % frequency [MHz]
+f0 = 0.5E6;               % frequency [MHz]
 Amp = 100;                % amplitude at source.p_mask
 
 % amount to steer (axial dim is third dim)
@@ -78,14 +78,18 @@ dim = padsize;
 % get medium properties (density and speed of sound for now)
 medium = getAcousticProperties(ct.data);
 
-% create kgrid
-vox = ct.info.PixelDimensions;
+% %% test in water 
+% medium.density = 997.*ones(dim);
+% medium.sound_speed = 1480.*ones(dim);
+
+%% create kgrid
+vox = 1E-3.*ct.info.PixelDimensions;
 kgrid = kWaveGrid(dim(1), vox(1), dim(2), vox(2), dim(3), vox(3));
 [kgrid.t_array, ~] = makeTime(kgrid, medium.sound_speed);
 
 %% create pressure vector
 source.p = createCWSignals(kgrid.t_array, f0, Amp, 0);
-foo = round(f0*kgrid.dt); %samp/cyc
+foo = round(1/(f0*kgrid.dt)); %samp/cyc
 % zero out source after 5 cyc;
 source.p(foo*5:end)=0;
 
@@ -120,7 +124,7 @@ sensor.record = {'p'};
 
 sensor_data = kspaceFirstOrder3DG(kgrid,medium,source,sensor);
 %  save output data
-save(fnout,'sensor_data','medium','kgrid','focus_pos','orderV','padpre','padpost','ctfn');
+save(fnout,'sensor_data','medium','kgrid','focus_pos','orderV','padpre','padpost','ctfn','f0');
 
 
 

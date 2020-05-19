@@ -52,7 +52,7 @@ dim = padsize;
 medium = getAcousticProperties(ct.data);
 
 % create kgrid
-vox = ct.info.PixelDimensions;
+vox = 1E-3.*ct.info.PixelDimensions;
 kgrid = kWaveGrid(dim(1), vox(1), dim(2), vox(2), dim(3), vox(3));
 [kgrid.t_array, dt_SIM] = makeTime(kgrid, medium.sound_speed);
 

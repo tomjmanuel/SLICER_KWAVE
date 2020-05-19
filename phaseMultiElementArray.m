@@ -1,6 +1,6 @@
 %% load in data from Slicer2Kwave_timeReversal.m
 clear all
-load('patsesnsor.mat')
+load('patsesnsorwater.mat')
 
 % point at the nifti with labeled elements
 fnlabeledxdcr = 'xdcr_128elem_R100_D100_vox250um_labeled.nii.gz';
@@ -10,7 +10,7 @@ fnlabeledxdcr = 'xdcr_128elem_R100_D100_vox250um_labeled.nii.gz';
 fnxdcr = 'xdcr_128elem_R100_D100_vox250um.nii.gz';
 
 % name for nifti that will hold pressure output
-fnout = 'prms_testmultielement';
+fnout = 'prms_testmultielement_water';
 
 %% visualize pdata 
 % use this plot to select a time window that incorporates
@@ -21,9 +21,9 @@ plot(sensor_data.p(10:10:end,:)')
 
 
 %% a few inputs to set
-freq = 0.5E6; %[MHz]
-t0 = 1; % beginning time to calc phase
-te = 1800; % end time to calc phase
+freq = f0; %0.5E6; %[MHz] should load in with other sensor_data
+t0 = 1200; % beginning time to calc phase
+te = 1500; % end time to calc phase
 Amp = 100;
 
 %%
@@ -71,9 +71,6 @@ xdcr = niftiread(fnxdcr);
 
 % zero xdcr focus points
 xdcr(xdcr>1)=0;
-
-% padpre = [15 13 20];
-% padpost = [15 12 21];
 
 % pad both grids to match sim space size
 xdcr = padarray(xdcr,padpre,0,'pre');
@@ -160,5 +157,5 @@ pout = pout(padpre(1)+1:end-padpost(1),padpre(2)+1:end-padpost(2),...
 info = niftiinfo(fnxdcr);
 % if file won't write, you may need to change some properties in info
 %info.Datatype = 'single';
-% write nifti using metadata from ctfile
+%% write nifti using metadata from ctfile
 niftiwrite(pout,fnout,info,'compressed',true);
