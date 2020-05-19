@@ -28,9 +28,9 @@ f0 = 0.5E6;               % frequency [MHz]
 Amp = 100;                % amplitude at source.p_mask
 
 % amount to steer (axial dim is third dim)
-axialsteer = -10; %[mm] negative steers towards xdcr, positive away
-latsteer1   = 0;  %[mm] lat steering in first dimension
-latsteer2   = 0;  %[mm] lat steering in second dimension
+axialsteer = -10E-3;    %[m] negative steers towards xdcr, positive away
+latsteer1   = 0;        %[m] lat steering in first dimension
+latsteer2   = 0;        %[m] lat steering in second dimension
 
 %% load data and set final sim size (to include padding for pml & fft efficiency)
 ct.data = niftiread(ctfn);
