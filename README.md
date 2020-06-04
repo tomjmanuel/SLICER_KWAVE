@@ -1,2 +1,2 @@
-# SLICER_ICP_REGISTRATION
-This branch is for Michelle developing optical tracking 
+# PLUS_SLICER_OPTICAL_TRACKING
+This branch provide instructions and templates for using PLUS with the optical tracking setup. 
