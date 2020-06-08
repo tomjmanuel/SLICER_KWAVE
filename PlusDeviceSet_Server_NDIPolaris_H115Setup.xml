@@ -1,0 +1,53 @@
+<PlusConfiguration version="2.1">
+
+  <DataCollection StartupDelaySec="1.0" >
+    <DeviceSet 
+      Name="PlusServer: NDI Polaris Tracking the H115 Transducer" 
+      Description="Broadcasting tool tracking data through OpenIGTLink
+For NDI Polaris passive marker starting kit: Tool (8700339), Stylus (8700340), Reference (8700449)" />
+    <Device
+      Id="TrackerDevice"
+      Type="PolarisTracker"
+	  AcquisitionRate = "20"
+      ToolReferenceFrame="Tracker" >
+      <DataSources>
+        <DataSource Type="Tool" Id="Tool" RomFile="NdiToolDefinitions/H115_Tk2_v2.rom"  />
+        <DataSource Type="Tool" Id="Stylus" RomFile="NdiToolDefinitions/8700340.rom"  />
+      </DataSources>
+      <OutputChannels>
+        <OutputChannel Id="TrackerStream" >
+          <DataSource Id="Tool"/>
+          <DataSource Id="Stylus"/>
+        </OutputChannel>
+      </OutputChannels>
+    </Device>   
+  </DataCollection>
+
+  <CoordinateDefinitions>
+    <Transform From="StylusTip" To="Stylus"
+      Matrix="
+        1	0	0.000203823	0.0180449
+        3.31529e-09	-1	-1.62655e-05	-0.00144002
+        0.000203823	1.62655e-05	-1	-88.5321
+        0	0	0	1"
+       Error="0.554951" Date="012617_105449" />
+  </CoordinateDefinitions>
+
+  <PlusOpenIGTLinkServer 
+    MaxNumberOfIgtlMessagesToSend="1"
+    MaxTimeSpentWithProcessingMs="50"
+    ListeningPort="18944"
+    SendValidTransformsOnly="true"
+    OutputChannelId="TrackerStream" >
+    <DefaultClientInfo>
+      <MessageTypes>
+        <Message Type="TRANSFORM" />
+      </MessageTypes>
+      <TransformNames>
+        <Transform Name="ToolToTracker" />
+        <Transform Name="StylusToTracker" />
+      </TransformNames>
+    </DefaultClientInfo>
+  </PlusOpenIGTLinkServer>
+
+</PlusConfiguration>
