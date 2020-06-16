@@ -1,12 +1,12 @@
 %https://stackoverflow.com/questions/38997302/create-random-unit-vector-inside-a-defined-conical-region/39003745#39003745
 % generate points along spherical cap (random distribution)
 clear all
-R = 100; D = 100;
+R = 50; D = 50;
 height = R-sqrt(R^2-(D/2)^2);
 coneAngle  =  acos((R-height)/R);
 
 coneDir = [0 0 1];
-n=128;
+n=64;
 
 z = rand(n,1)*(1-cos(coneAngle)) + cos(coneAngle);
 phi = rand(n,1)*2*pi;
@@ -25,7 +25,12 @@ x = R.*x; y=R.*y; z= R.*z;
 
 % helps to slowly step spacing up
 %
-spacing = .1:.0005:6.1; %space between center of elements
+% output video
+% V2 = VideoWriter('xdcrDemo');
+% open(V2);
+% figure 
+
+spacing = .1:.001:5.1; %space between center of elements
 for s=1:length(spacing)
     for i=1:n
         for j=1:n
@@ -66,7 +71,14 @@ for s=1:length(spacing)
         end 
     end
     spacing(s)
+%     if mod(s,100)==1
+%         scatter3(x,y,z,'filled')
+%         axis equal
+%         title('Arranging elements')
+%         writeVideo(V2,getframe(gcf))
+%     end
 end
+%close(V2)
 
 %% visualize
 %close all
@@ -77,6 +89,6 @@ axis equal
 %% save
 z = -1.*(z-R);
 A = [x y z];
-save('transducer_128elem_R100_D100.mat','A');
+save('transducer_64elem_R50_D50.mat','A');
 
 
