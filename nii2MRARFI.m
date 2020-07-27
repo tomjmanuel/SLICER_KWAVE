@@ -40,10 +40,15 @@ function nii2MRARFI(fni,fno,maskVal)
     
     data = complex(R,Im);
 
+%     % compute ARFI using a crytpic equation that "subtracts dynamics"
+%     arfi = angle( data(:,:,2:4:end) .* conj(data(:,:,1:4:end)) .* conj( ...
+%     data(:,:,4:4:end) .* conj(data(: ,:,3:4:end)) )); % subtraction of dynamics (used timing and averaging)
+%    
     % compute ARFI using a crytpic equation that "subtracts dynamics"
-    arfi = angle( data(:,:,2:4:end) .* conj(data(:,:,1:4:end)) .* conj( ...
-    data(:,:,4:4:end) .* conj(data(: ,:,3:4:end)) )); % subtraction of dynamics (used timing and averaging)
-    
+    arfi = angle( data(:,:,4:4:end) .* conj(data(:,:,3:4:end)) .* conj( ...
+    data(:,:,6:4:end) .* conj(data(: ,:,5:4:end)) )); % subtraction of dynamics (used timing and averaging)
+   
+
     Nx = size(arfi,1);
     Ny = size(arfi,2);
     Navg = size(arfi,3);
@@ -53,8 +58,15 @@ function nii2MRARFI(fni,fno,maskVal)
 
     % This portion of the code was written by Sumeeth
     % it subtracts background phase...
-    [xx,yy] = ndgrid((1:Nx)-55,(1:Ny)-40); % mask location can have a big effect on results
-    mask = (xx.^2 + yy.^2)<5^2;
+    figure
+    imagesc(-arfi,[-1 1])
+    pos = ginput(1);
+    [xx,yy] = ndgrid((1:Nx)-pos(2),(1:Ny)-pos(1)); % mask location can have a big effect on results
+    mask = (xx.^2 + yy.^2)<6^2;
+    imagesc(mask)
+   % mask2 =  (xx.^2 + yy.^2)<4^2;
+    %maskConc = mask-mask2;
+    %maskConc = maskConc>0;
     for i = 1 : Navg % subtract out background phase from a circular ROI ("mask") near the focus; repeat for each dynamic
         tmp1 = arfi(:,:,i);
         arfi(:,:,i) = tmp1 - mean(tmp1(mask));
@@ -81,6 +93,8 @@ function nii2MRARFI(fni,fno,maskVal)
     ni = zeros(info.ImageSize);
     ni(:,:,1) = arfi;
     ni(:,:,2) = arfi;
+    
+    % rescale values to be easier to visualize in slicer (not quant)
  
     niftiwrite(ni,fno,info);
 

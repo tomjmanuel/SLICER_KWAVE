@@ -21,7 +21,9 @@ fni = strcat(path,file);
 fno = strcat(path,file(1:end-4),'_arfi.nii');
 
 %relative value (0 to 1) to mask displacement image with using magnitude
-maskVal = 0.3; 
+maskVal = 0; 
+
+%%
 
 % call function (it writes out a nifti, nothing is returned)
 nii2MRARFI(fni,fno,maskVal);

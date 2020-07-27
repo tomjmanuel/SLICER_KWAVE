@@ -21,10 +21,10 @@ fni = strcat(path,file);
 fno = strcat(path,file(1:end-4),'_Thermom.nii');
 
 %relative value (0 to 1) to mask displacement image with using magnitude
-maskVal = 0.3; 
+maskVal = 0.05; 
 
 %% call function (it writes out a nifti, nothing is returned)
-dynamicSlice = 15; %The dynamic to use for image formation, to give temp contrast
+dynamicSlice = 12; %The dynamic to use for image formation, to give temp contrast
 
 % a figure will pop up visualizing the slice selected, rerun the function
 % with a new dynamic selected if you don't like it.

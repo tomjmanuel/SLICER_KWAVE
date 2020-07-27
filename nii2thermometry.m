@@ -59,6 +59,11 @@ function nii2thermometry(fni,fno,maskVal,dyn)
     TEstring = Pinfo.raw.descrip(4:5);
     TEms = str2double(TEstring);
 
+    if isnan( TEms)
+        'warning: TE unknown, not temperature'
+        TEms = 10;
+    end
+    
     % factor to convert phase to temp 
     alpha = 0.01;
     B0 = 7.0;
