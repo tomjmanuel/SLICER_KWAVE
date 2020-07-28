@@ -20,10 +20,35 @@ fni = strcat(path,file);
 % create full path output file name (in this case, append _arfi)
 fno = strcat(path,file(1:end-4),'_arfi.nii');
 
-%relative value (0 to 1) to mask displacement image with using magnitude
-maskVal = 0; 
 
-%%
+%% generate arfi image and info to write nifti
 
 % call function (it writes out a nifti, nothing is returned)
-nii2MRARFI(fni,fno,maskVal);
+[arfIm, info, magIm] = nii2MRARFI(fni);
+close all
+
+%% interactively scale contrast
+% click the black white icon to interactively scale contrast
+% when done hit adjust data 
+% then in figure file->export to workspace to save the image data as a 
+% variable (I save as arfi2)
+imtool(arfIm,'InitialMagnification','fit')
+
+%% select mask value
+% make sure 2 change line 37 to match whatever variable you exported
+newarf = arfi2;
+maskVal = .4;
+newarf = newarf.*(magIm>maskVal);
+imagesc(newarf)
+
+%% write newarf out to nifti
+ni = zeros(info.ImageSize);
+ni(:,:,1) = newarf;
+ni(:,:,2) = newarf;
+
+% rescale values to be easier to visualize in slicer (not quant)
+
+niftiwrite(ni,fno,info);
+
+
+

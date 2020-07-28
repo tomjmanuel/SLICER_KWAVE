@@ -5,15 +5,15 @@
 clear all
 close all
 % define spherical cap
-R = 50; %mm
-D = 50; %mm
+R = 110; %mm
+D = 80; %mm
 fn = R/D; % fnumber
 h = sqrt(R^2 - (D/2)^2); % height of base of spherical cap
 
-elemSpace = 3.53; %distance between elements [mm]
+elemSpace = 5.56; %distance between elements [mm]
 
 flag = 0; % flag goes to one when elements are maximally packed
-npts = 1700; % n points to put on the sphere (starting number)
+npts = 3600; % n points to put on the sphere (starting number)
 
 while ~flag
 
@@ -46,7 +46,7 @@ axis equal
 %% save
 zz = -1.*zz+max(zz);
 A = [xx' yy' zz'];
-save('neem_elem_locs.mat','A');
+save('george_elem_locs.mat','A');
 
 %% 2d (sunflower packing)
 close all

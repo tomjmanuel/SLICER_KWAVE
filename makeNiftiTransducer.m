@@ -5,11 +5,11 @@
 %   voxel sizes
 
 clear all
-load('Olivier.mat');
+load('george_elem_locs.mat');
 
-radius_mm = 50;
-diameter_mm = 4.9; %element diameter not transducer diameter
-nE = 64; % n elements
+radius_mm = 110;
+diameter_mm = 5; %element diameter not transducer diameter
+nE = 128; % n elements
 
 usf = 4; % grid usf
 padding = 30; % padding in all 3 dim
@@ -21,6 +21,8 @@ fL = round(D/2);
 D = D+padding;
 fL(3)=radius_mm*usf+padding/2; % set z focus at 1;
 D(3) = fL(3)+padding+zpaddingextra;
+fL(1) = fL(1)+padding/2;
+fL(2) = fL(2)+padding/2;
 
 diam_pix = round(diameter_mm*usf);
 if mod(diam_pix,2)==0
@@ -46,9 +48,9 @@ bowls(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 
 % outputs
 % pixel coordinates to be used with timereversal
-save('Olivier_pixcoords.mat','A');
+save('george_pixcoords.mat','A');
 % labeled bowls
-niftiwrite(labels,'Olivier_labeled.nii','compressed',true);
+niftiwrite(labels,'george_labeled.nii','compressed',true);
 % map with all sensor points marked 1, and focus labeled as 255, with
 % surrounding voxels labeled 200
-niftiwrite(bowls,'Olivier.nii','compressed',true);
+niftiwrite(bowls,'george.nii','compressed',true);

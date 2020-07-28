@@ -10,13 +10,9 @@
 %       convert par rec files into niftis
 %       - Given 1 par file, dcm2niix returns 4 seperate nii
 %       - These all need to be in same path 
-%   fno: output filename
-%   maskVal:percentage (0 to 1)
-%           mask displacement image with magnitude image>maskVal
-%           just set to 0 if you don't want to mask
 
 
-function nii2MRARFI(fni,fno,maskVal)
+function [arfi, info, mag] = nii2MRARFI(fni)
 
     % modify fni to point at real and imaginary images
     realfn = strcat(fni(1:end-4),'_real.nii');
@@ -40,13 +36,13 @@ function nii2MRARFI(fni,fno,maskVal)
     
     data = complex(R,Im);
 
-%     % compute ARFI using a crytpic equation that "subtracts dynamics"
-%     arfi = angle( data(:,:,2:4:end) .* conj(data(:,:,1:4:end)) .* conj( ...
-%     data(:,:,4:4:end) .* conj(data(: ,:,3:4:end)) )); % subtraction of dynamics (used timing and averaging)
-%    
     % compute ARFI using a crytpic equation that "subtracts dynamics"
-    arfi = angle( data(:,:,4:4:end) .* conj(data(:,:,3:4:end)) .* conj( ...
-    data(:,:,6:4:end) .* conj(data(: ,:,5:4:end)) )); % subtraction of dynamics (used timing and averaging)
+    arfi = angle( data(:,:,2:4:end) .* conj(data(:,:,1:4:end)) .* conj( ...
+    data(:,:,4:4:end) .* conj(data(: ,:,3:4:end)) )); % subtraction of dynamics (used timing and averaging)
+   
+    % compute ARFI using a crytpic equation that "subtracts dynamics"
+%    arfi = angle( data(:,:,4:4:end) .* conj(data(:,:,3:4:end)) .* conj( ...
+%    data(:,:,6:4:end) .* conj(data(: ,:,5:4:end)) )); % subtraction of dynamics (used timing and averaging)
    
 
     Nx = size(arfi,1);
@@ -59,11 +55,12 @@ function nii2MRARFI(fni,fno,maskVal)
     % This portion of the code was written by Sumeeth
     % it subtracts background phase...
     figure
-    imagesc(-arfi,[-1 1])
+    imagesc(-arfi(:,:,1),[-1 1])
+    title('click on region to use for phase background')
     pos = ginput(1);
     [xx,yy] = ndgrid((1:Nx)-pos(2),(1:Ny)-pos(1)); % mask location can have a big effect on results
     mask = (xx.^2 + yy.^2)<6^2;
-    imagesc(mask)
+    %imagesc(mask)
    % mask2 =  (xx.^2 + yy.^2)<4^2;
     %maskConc = mask-mask2;
     %maskConc = maskConc>0;
@@ -79,8 +76,8 @@ function nii2MRARFI(fni,fno,maskVal)
     % actually, masking with zeros isn't the best since
     % set masked values = to -10 um;
     mag = abs(mean(data,3)); mag = mag ./ max(mag(:));
-    mask = mag > maskVal;
-    arfi(~mask)=-10;
+%     mask = mag > maskVal;
+%     arfi(~mask)=-10;
     
     % now put arfi values into an image with appropriate orientation
     % I'm only able to make this work as a multislice
@@ -89,13 +86,15 @@ function nii2MRARFI(fni,fno,maskVal)
     info.ImageSize = [info.ImageSize(1) info.ImageSize(2) 2];
     info.PixelDimensions = [info.PixelDimensions(1) info.PixelDimensions(2) info.PixelDimensions(3)/2];
     info.Datatype = 'double';
+    info.AdditiveOffset = 0;
+    info.MultiplicativeScaling = 1000;
     
-    ni = zeros(info.ImageSize);
-    ni(:,:,1) = arfi;
-    ni(:,:,2) = arfi;
+%     ni = zeros(info.ImageSize);
+%     ni(:,:,1) = arfi;
+%     ni(:,:,2) = arfi;
     
     % rescale values to be easier to visualize in slicer (not quant)
  
-    niftiwrite(ni,fno,info);
+%     niftiwrite(ni,fno,info);
 
 end
