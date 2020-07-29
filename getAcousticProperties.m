@@ -40,6 +40,6 @@ function medium = getAcousticProperties(CT)
 
 
     medium.alpha_power = 1.1; % from aubry and commonly used
-    medium.alpha_coeff = 0.2.*ones(size(kgrid.x));
+    medium.alpha_coeff = 0.2.*ones(size(CT));
     medium.alpha_coeff(bone_i) = 2.7+5.4;
 end
