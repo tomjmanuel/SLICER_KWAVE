@@ -79,7 +79,7 @@ dim = padsize;
 % get medium properties (density and speed of sound for now)
 medium = getAcousticProperties(ct.data);
 
-% %% test in water 
+% % %% test in water 
 % medium.density = 997.*ones(dim);
 % medium.sound_speed = 1480.*ones(dim);
 
@@ -155,9 +155,14 @@ axis image
 % unpad
 pout = pout(padpre(1)+1:end-padpost(1),padpre(2)+1:end-padpost(2),...
     padpre(3)+1:end-padpost(3));
-
-info = niftiinfo(fnxdcr);
+%%
+info = niftiinfo('IGT_labeled.nii.gz');
 % if file won't write, you may need to change some properties in info
-%info.Datatype = 'single';
+info.Datatype = 'double';
 %% write nifti using metadata from ctfile
-niftiwrite(pout,fnout,info,'compressed',true);
+%niftiwrite(pout,fnout,info,'compressed',true);
+% sometimes niftiwrite modifies transforms
+% you can just save the nifti with no info and pass it through
+% slicer transforms to visualize in correct space
+% will have to modify voxel sizes in slicer to do this
+niftiwrite(pout,fnout,'compressed',true);

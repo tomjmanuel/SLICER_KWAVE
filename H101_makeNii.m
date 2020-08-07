@@ -4,7 +4,7 @@
 
 %% Setup Sim space Extent
 clear all
-Nx = 80; Ny = 80; Nz = 80;
+Nx = 160; Ny = 160; Nz = 160;
 
 % using h115, focusing down x dim
 XrangeSim = .08;
