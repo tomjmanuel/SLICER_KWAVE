@@ -5,13 +5,13 @@
 %   voxel sizes
 
 clear all
-load('george_elem_locs.mat');
+load('healdream_elem_locs.mat');
 
 radius_mm = 110;
-diameter_mm = 5; %element diameter not transducer diameter
-nE = 128; % n elements
+diameter_mm = 4; %element diameter not transducer diameter
+nE = 1024; % n elements
 
-usf = 4; % grid usf
+usf = 2; % grid usf
 padding = 30; % padding in all 3 dim
 zpaddingextra = 30; % optional extra z padding
 
@@ -19,7 +19,7 @@ zpaddingextra = 30; % optional extra z padding
 D = ceil(range(A))*usf;
 fL = round(D/2);
 D = D+padding;
-fL(3)=radius_mm*usf+padding/2; % set z focus at 1;
+fL(3)=radius_mm*usf+padding/2; % set z focus
 D(3) = fL(3)+padding+zpaddingextra;
 fL(1) = fL(1)+padding/2;
 fL(2) = fL(2)+padding/2;
@@ -33,8 +33,7 @@ end
 A = A.*usf;
 A(:,1) = A(:,1)+fL(1);
 A(:,2) = A(:,2)+fL(2);
-A(:,3) = A(:,3);
-A = A+padding/2;
+A(:,3) = A(:,3)+(fL(3)-radius_mm*usf);
 A = round(A);
 
 %grid_size, bowl_pos, radius, diameter, focus_pos
@@ -48,9 +47,9 @@ bowls(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 
 % outputs
 % pixel coordinates to be used with timereversal
-save('george_pixcoords.mat','A');
+save('healdream_pixcoords.mat','A');
 % labeled bowls
-niftiwrite(labels,'george_labeled.nii','compressed',true);
+niftiwrite(labels,'healdream_labeled.nii','compressed',true);
 % map with all sensor points marked 1, and focus labeled as 255, with
 % surrounding voxels labeled 200
-niftiwrite(bowls,'george.nii','compressed',true);
+niftiwrite(bowls,'healdream.nii','compressed',true);
