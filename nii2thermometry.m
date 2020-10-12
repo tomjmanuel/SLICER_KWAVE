@@ -2,7 +2,8 @@
 % Tom
 % 8/7/2020
 
-% This script depends on PhaseUnwrapping2D
+% This script depends on PhaseUnwrapping2D if you need phase unwrapping
+% (often you do not)
 % this can be found on Tom's github within the slicerkwave repo
 % using the uigetfile, select the thermometry magnitude .nii file
 
@@ -24,22 +25,16 @@ fno = strcat(path,file(1:end-4),'_Thermom.nii');
 
 
 %% create rough versions of temperature images
-dynamicSlice = 12; %The dynamic to use for image formation, to give temp contrast
-
-% modify fni to phase image
+dynamicSlice = 10; %The dynamic to use for image formation, to give temp contrast
 dyn = dynamicSlice;
-phase_fn = strcat(fni(1:end-4),'_ph.nii');
 
-%load phase image
-Pim = niftiread(phase_fn);
-Pinfo = niftiinfo(phase_fn);
-
-% get Phase back into its original values (-pi to pi)
-Pim = double(Pim);
-Pim = Pim.*Pinfo.MultiplicativeScaling;
-Pim = Pim+Pinfo.AdditiveOffset;
-Pim = Pim.*.001; % they scaled up by 1000 to keep precision with int16
-
+% use real and imaginary images to compute phase
+% for whatever reason, just using the phase is often noisier
+real_fn = strcat(fni(1:end-4),'_real.nii');
+im_fn = strcat(fni(1:end-4),'_imaginary.nii');
+Rim = double(niftiread(real_fn));
+Iim = double(niftiread(im_fn));
+Pim = angle(complex(Rim,Iim));
 
 % load magnitude image
 Im = niftiread(fni);
@@ -52,18 +47,11 @@ Im = double(Im);
 nSlices = size(Pim,3);
 nDyn    = size(Pim,4);
 
-% % We want to save a volume which represents maximum dynamic contrast
-% % the input value selects a slice to use
-% % display this slice for visualization
-% imagesc(squeeze(Pim(:,:,1,dyn)))
-% title('Slice being compared to baseline for temperature')
-
-
 % grab baseline from 3rd to 5th images
 bL = squeeze(mean(Pim(:,:,:,3:5),4));
 
 % get echo time in milliseconds (only works for 2digit echotimes)
-TEstring = Pinfo.raw.descrip(4:5);
+TEstring = ImInfo.raw.descrip(4:5);
 TEms = str2double(TEstring);
 
 if isnan( TEms)
@@ -81,6 +69,7 @@ dynFrame = squeeze(Pim(:,:,:,dyn));
 tempIm = dynFrame-bL; % temperature image (still in phase units)
 
 % click through these to see if any slices need unwrapping
+% They need unwrapping if weird ring artifacts show up in these images
 for i=1:nSlices
     figure
     imagesc(tempIm(:,:,i),[-1.5 1.5])
@@ -89,7 +78,7 @@ for i=1:nSlices
 end
 
 %% tune mask using mask Val
-maskVal = 0.1; % set between 0 and 1 (0.1 is working in phantoms)
+maskVal = 0.025; % set between 0 and 1 (0.1 is working in phantoms)
 mask = squeeze(mean(Im(:,:,:,1:3),4));
 mask = mask./max(mask(:));
 mask= mask>maskVal;
@@ -101,7 +90,7 @@ imagesc(mask(:,:,1))
 % skip this section if no slices have wrapping at focus
 % if a slice needs unwrapping
 % if a multiple slices need it, just run this section multiple times
-frame2unwrap = 3;
+frame2unwrap = 5;
 
 IM_phase=dynFrame(:,:,frame2unwrap);                         %Phase image
 IM_mask = mask(:,:,frame2unwrap);
@@ -134,8 +123,31 @@ title('unwrapped')
 %% convert from phase to temp
 tempIm = factor.*tempIm.*mask;
 
-%%now put temperature values into an image with appropriate orientation
-info = Pinfo;
+% use the imtool to pick out the best data range
+% click the black and white icon in the window that pops up
+% this lets you scale the histogram
+% tune the histogram and then copy the values from the "window"
+% section into the mm and MM variables below
+frame = 3; %frame with focus in it to scale contrast
+imtool(tempIm(:,:,frame),'InitialMagnification','fit');
+
+%% grab and visualize new contrast scaled temperature
+% using max and min in the imtool window section, write those down here
+% at the end of this section, foo should have values from 0 to 1
+close all
+mm = -0.069;
+MM = 0.4063;
+% scale the image such that mm goes to zero and MM goes to 1
+foo = tempIm;
+foo = foo-mm; %mm values become zero with this shift, MM become MM-mm
+foo(foo<0)=0; %all things below zero can be zero now
+foo(foo>(-mm+MM))=(-mm+MM); 
+foo = foo./(-mm+MM);
+imagesc(foo(:,:,frame))
+
+%% now put temperature values into an image with appropriate orientation
+tempIm = foo;
+info = ImInfo;
 info.ImageSize = [info.ImageSize(1) info.ImageSize(2) nSlices];
 info.PixelDimensions = [info.PixelDimensions(1) info.PixelDimensions(2) info.PixelDimensions(3)];
 info.Datatype = 'double';

@@ -1,17 +1,18 @@
 % make nifti transducer file 
 % input makeSphericalRandom
+% or makeFibonocciArray
 % uses makemultibowl (kwave)
 % after writing nifti, you must load it into slicer and adjust 
 %   voxel sizes
 
 clear all
-load('george_elem_locs.mat');
+load('transducer_128elem_R85_D125.mat');
 
-radius_mm = 110;
+radius_mm = 85;
 diameter_mm = 5; %element diameter not transducer diameter
 nE = 128; % n elements
 
-usf = 4; % grid usf
+usf = 2; % grid usf
 padding = 30; % padding in all 3 dim
 zpaddingextra = 30; % optional extra z padding
 
@@ -33,8 +34,8 @@ end
 A = A.*usf;
 A(:,1) = A(:,1)+fL(1);
 A(:,2) = A(:,2)+fL(2);
-A(:,3) = A(:,3);
-A = A+padding/2;
+A(:,3) = A(:,3)+padding/2;
+%A = A+padding/2;
 A = round(A);
 
 %grid_size, bowl_pos, radius, diameter, focus_pos
@@ -48,9 +49,9 @@ bowls(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 
 % outputs
 % pixel coordinates to be used with timereversal
-save('george_pixcoords.mat','A');
+save('IUS_pixcoords.mat','A');
 % labeled bowls
-niftiwrite(labels,'george_labeled.nii','compressed',true);
+niftiwrite(labels,'IUS_labeled.nii','compressed',true);
 % map with all sensor points marked 1, and focus labeled as 255, with
 % surrounding voxels labeled 200
-niftiwrite(bowls,'george.nii','compressed',true);
+niftiwrite(bowls,'IUS.nii','compressed',true);
