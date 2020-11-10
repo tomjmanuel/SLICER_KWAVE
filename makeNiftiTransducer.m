@@ -6,13 +6,13 @@
 %   voxel sizes
 
 clear all
-load('transducer_128elem_R85_D125.mat');
+load('scanskull.mat');
 
-radius_mm = 85;
-diameter_mm = 5; %element diameter not transducer diameter
-nE = 128; % n elements
+radius_mm = 72;
+diameter_mm = 1; %element diameter not transducer diameter
+nE = 3097; % n elements
 
-usf = 2; % grid usf
+usf = 5; % grid usf
 padding = 30; % padding in all 3 dim
 zpaddingextra = 30; % optional extra z padding
 
@@ -49,9 +49,9 @@ bowls(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 
 % outputs
 % pixel coordinates to be used with timereversal
-save('IUS_pixcoords.mat','A');
+save('skullscanpixcoords.mat','A');
 % labeled bowls
-niftiwrite(labels,'IUS_labeled.nii','compressed',true);
+%niftiwrite(labels,'IUS_labeled.nii','compressed',true);
 % map with all sensor points marked 1, and focus labeled as 255, with
 % surrounding voxels labeled 200
-niftiwrite(bowls,'IUS.nii','compressed',true);
+niftiwrite(bowls,'skullscan.nii','compressed',true);

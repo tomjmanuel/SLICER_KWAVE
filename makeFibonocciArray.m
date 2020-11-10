@@ -5,16 +5,16 @@
 clear all
 close all
 % define spherical cap
-R = 110; %mm
-D = 90; %mm
+R = 72; %mm
+D = 120; %mm
 fn = R/D; % fnumber
 h = sqrt(R^2 - (D/2)^2); % height of base of spherical cap
 
-elemSpace = 6.28; %distance between elements [mm]
+elemSpace = 4; %distance between elements [mm]
 
 flag = 0; % flag goes to one when elements are maximally packed
-npts = 2800; % n points to put on the sphere (starting number)
-
+npts = 2000; % n points to put on the sphere (starting number)
+ 
 while ~flag
 
     [x,y,z] = getFibSphere(npts);
@@ -46,7 +46,7 @@ axis equal
 %% save
 zz = -1.*zz+max(zz);
 A = [xx' yy' zz'];
-save('obama9.mat','A');
+save('scanskull.mat','A');
 
 %% 2d (sunflower packing)
 close all

@@ -23,7 +23,7 @@ fno = strcat(path,file(1:end-4),'_arfi.nii');
 
 %% generate arfi image and info to write nifti
 
-% call function (it writes out a nifti, nothing is returned)
+% call function
 [arfIm, info, magIm] = nii2MRARFI(fni);
 close all
 
@@ -45,8 +45,6 @@ imagesc(newarf)
 ni = zeros(info.ImageSize);
 ni(:,:,1) = newarf;
 ni(:,:,2) = newarf;
-
-% rescale values to be easier to visualize in slicer (not quant)
 
 niftiwrite(ni,fno,info);
 

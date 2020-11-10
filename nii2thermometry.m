@@ -25,7 +25,7 @@ fno = strcat(path,file(1:end-4),'_Thermom.nii');
 
 
 %% create rough versions of temperature images
-dynamicSlice = 10; %The dynamic to use for image formation, to give temp contrast
+dynamicSlice = 15; %The dynamic to use for image formation, to give temp contrast
 dyn = dynamicSlice;
 
 % use real and imaginary images to compute phase
@@ -68,6 +68,11 @@ factor = 1.0 / (42.576*alpha*B0*(TEms*1e-3)*2*pi);
 dynFrame = squeeze(Pim(:,:,:,dyn));
 tempIm = dynFrame-bL; % temperature image (still in phase units)
 
+for k = 1:nDyn
+    tempImgs(:,:,:,k) = squeeze(Pim(:,:,:,k))-bL;
+end
+
+
 % click through these to see if any slices need unwrapping
 % They need unwrapping if weird ring artifacts show up in these images
 for i=1:nSlices
@@ -78,7 +83,7 @@ for i=1:nSlices
 end
 
 %% tune mask using mask Val
-maskVal = 0.025; % set between 0 and 1 (0.1 is working in phantoms)
+maskVal = 0.135; % set between 0 and 1 (0.1 is working in phantoms)
 mask = squeeze(mean(Im(:,:,:,1:3),4));
 mask = mask./max(mask(:));
 mask= mask>maskVal;
@@ -86,38 +91,38 @@ mask= mask>maskVal;
 close all
 imagesc(mask(:,:,1))
 
-%% unwrap phase?
-% skip this section if no slices have wrapping at focus
-% if a slice needs unwrapping
-% if a multiple slices need it, just run this section multiple times
-frame2unwrap = 5;
-
-IM_phase=dynFrame(:,:,frame2unwrap);                         %Phase image
-IM_mask = mask(:,:,frame2unwrap);
-%  Set parameters
-max_box_radius=30;                           %Maximum search box radius (pixels)
-threshold_std=5;                            %Number of noise standard deviations used for thresholding the magnitude image
-
-% Unwrap
-residue_charge=PhaseResidues(IM_phase, IM_mask);                            %Calculate phase residues
-branch_cuts=BranchCuts(residue_charge, max_box_radius, IM_mask);            %Place branch cuts
-[IM_unwrapped_dyn, rowref, colref]=FloodFill(IM_phase, branch_cuts, IM_mask);   %Flood fill phase unwrapping
-
-% Unwrap
-IM_phase = bL(:,:,frame2unwrap);
-residue_charge=PhaseResidues(IM_phase, IM_mask);                            %Calculate phase residues
-branch_cuts=BranchCuts(residue_charge, max_box_radius, IM_mask);            %Place branch cuts
-[IM_unwrapped_bL, rowref, colref]=FloodFill(IM_phase, branch_cuts, IM_mask);   %Flood fill phase unwrapping
-
-figure
-subplot(121)
-imagesc(tempIm(:,:,frame2unwrap),[-1.5 1.5])
-title('not unwrapped')
-
-tempIm(:,:,frame2unwrap)=IM_unwrapped_dyn-IM_unwrapped_bL;
-subplot(122)
-imagesc(tempIm(:,:,frame2unwrap),[-1.5 1.5])
-title('unwrapped')
+% %% unwrap phase?
+% % skip this section if no slices have wrapping at focus
+% % if a slice needs unwrapping
+% % if a multiple slices need it, just run this section multiple times
+% frame2unwrap = 5;
+% 
+% IM_phase=dynFrame(:,:,frame2unwrap);                         %Phase image
+% IM_mask = mask(:,:,frame2unwrap);
+% %  Set parameters
+% max_box_radius=30;                           %Maximum search box radius (pixels)
+% threshold_std=5;                            %Number of noise standard deviations used for thresholding the magnitude image
+% 
+% % Unwrap
+% residue_charge=PhaseResidues(IM_phase, IM_mask);                            %Calculate phase residues
+% branch_cuts=BranchCuts(residue_charge, max_box_radius, IM_mask);            %Place branch cuts
+% [IM_unwrapped_dyn, rowref, colref]=FloodFill(IM_phase, branch_cuts, IM_mask);   %Flood fill phase unwrapping
+% 
+% % Unwrap
+% IM_phase = bL(:,:,frame2unwrap);
+% residue_charge=PhaseResidues(IM_phase, IM_mask);                            %Calculate phase residues
+% branch_cuts=BranchCuts(residue_charge, max_box_radius, IM_mask);            %Place branch cuts
+% [IM_unwrapped_bL, rowref, colref]=FloodFill(IM_phase, branch_cuts, IM_mask);   %Flood fill phase unwrapping
+% 
+% figure
+% subplot(121)
+% imagesc(tempIm(:,:,frame2unwrap),[-1.5 1.5])
+% title('not unwrapped')
+% 
+% tempIm(:,:,frame2unwrap)=IM_unwrapped_dyn-IM_unwrapped_bL;
+% subplot(122)
+% imagesc(tempIm(:,:,frame2unwrap),[-1.5 1.5])
+% title('unwrapped')
 
 
 %% convert from phase to temp
@@ -135,8 +140,8 @@ imtool(tempIm(:,:,frame),'InitialMagnification','fit');
 % using max and min in the imtool window section, write those down here
 % at the end of this section, foo should have values from 0 to 1
 close all
-mm = -0.069;
-MM = 0.4063;
+mm = -0.1037;
+MM = 0.1411;
 % scale the image such that mm goes to zero and MM goes to 1
 foo = tempIm;
 foo = foo-mm; %mm values become zero with this shift, MM become MM-mm
