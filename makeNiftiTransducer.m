@@ -10,7 +10,7 @@ load('scanskull.mat');
 
 radius_mm = 72;
 diameter_mm = 1; %element diameter not transducer diameter
-nE = 3097; % n elements
+nE = 693; % n elements
 
 usf = 5; % grid usf
 padding = 30; % padding in all 3 dim
