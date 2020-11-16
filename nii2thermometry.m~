@@ -91,8 +91,8 @@ imtool(tempIm(:,:,frame),'InitialMagnification','fit');
 % using max and min in the imtool window section, write those down here
 % at the end of this section, foo should have values from 0 to 1
 close all
-mm = 0; % minimum deg C
-MM = 2; % maximum deg C
+mm = 0; % mimdeg C
+MM = 2; % deg C
 % scale the image such that mm goes to zero and MM goes to 1
 foo = tempIm;
 foo = foo-mm; %mm values become zero with this shift, MM become MM-mm
