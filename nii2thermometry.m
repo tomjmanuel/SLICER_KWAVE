@@ -68,7 +68,7 @@ factor = 1.0 / (42.576*alpha*B0*(TEms*1e-3)*2*pi);
 tempIm = angle(bL .* conj(squeeze(ImComp(:,:,:,dynamicSlice))));
 
 %% tune mask using mask Val
-maskVal = .1; % set between 0 and 1 (0.1 is working in phantoms)
+maskVal = .08; % set between 0 and 1 (0.1 is working in phantoms)
 mask = squeeze(mean(abs(ImComp(:,:,:,3:6)),4));
 mask = mask./max(mask(:));
 mask= mask>maskVal;
@@ -78,7 +78,7 @@ imagesc(mask(:,:,3))
 
 %% convert from phase to temp and find good contrast
 tempIm = factor.*tempIm.*mask;
-
+%%
 % use the imtool to pick out the best data range
 % click the black and white icon in the window that pops up
 % this lets you scale the histogram
@@ -92,7 +92,7 @@ imtool(tempIm(:,:,frame),'InitialMagnification','fit');
 % at the end of this section, foo should have values from 0 to 1
 close all
 mm = 0; % minimum deg C
-MM = 2; % maximum deg C
+MM = 2.2; % maximum deg C
 % scale the image such that mm goes to zero and MM goes to 1
 foo = tempIm;
 foo = foo-mm; %mm values become zero with this shift, MM become MM-mm

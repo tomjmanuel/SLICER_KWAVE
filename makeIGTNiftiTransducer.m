@@ -8,24 +8,25 @@ clear all
 load('IGTelemLocs.mat');
 
 A = elemLocs;
+
+% 20201207, changed elemlocs to match native coordinates (z mirrored)
 %
 radius_mm = 72;
 diameter_mm = 6.6; %element diameter not transducer diameter
 nE = 128; % n elements
 
-usf = 2; % grid usf
+usf = 4; % grid usf
 padding = 30; % padding in all 3 dim
 zpaddingextra = 30; % optional extra z padding
 
 %
-% A has element positions in mm
 D = ceil(range(A))*usf;
 D = D+padding;
 
 %
 fL = round(D/2);
-fL(3)=radius_mm*usf+padding/2; % set z focus at 1;
-D(3) = fL(3)+padding+zpaddingextra;
+
+%%
 
 diam_pix = round(diameter_mm*usf);
 if mod(diam_pix,2)==0
@@ -37,9 +38,16 @@ end
 A = A.*usf;
 A(:,1) = A(:,1)+fL(1);
 A(:,2) = A(:,2)+fL(2);
-A(:,3) = A(:,3)+padding/2;
-%A = A+padding/2;
 A = round(A);
+
+%% shift axially
+% focus is axially located at 1 right now
+% shift it up by the padding/2 + padding extraz
+fL(3)=padding/2+zpaddingextra;
+A(:,3)=A(:,3)+padding/2+zpaddingextra;
+
+%D(3) should equal the max of the xdcr (top of cap) +padding/2
+D(3)=max(A(:,3))+padding/2;
 
 
 %%
@@ -59,8 +67,9 @@ bowls(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 % assuming coordinates in bowls and labels are order xyz (so 500 steers in
 % dim 1)
 
-% zero everythign to make rendering easier
-bowls_with500 = bowls.*0;
+%called 500 but actually has points at
+% 500, 090, 00-8
+bowls_with500 = bowls;
 
 %mark 500
 dx = 1E-3/usf;
@@ -86,10 +95,10 @@ loc500(3) = loc500(3)-fivemmpx;
 bs = 3;
 bowls_with500(loc500(1)-bs:loc500(1)+bs,loc500(2)-bs:loc500(2)+bs,loc500(3)-bs:loc500(3)+bs)=200;
 
-%mark 000
-bs=1; % size of spot at focus
-bowls_with500(fL(1)-bs:fL(1)+bs,fL(2)-bs:fL(2)+bs,fL(3)-bs:fL(3)+bs)=200;
-bowls_with500(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
+% %mark 000
+% bs=1; % size of spot at focus
+% bowls_with500(fL(1)-bs:fL(1)+bs,fL(2)-bs:fL(2)+bs,fL(3)-bs:fL(3)+bs)=200;
+% bowls_with500(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 
 
 niftiwrite(bowls_with500,'IGTwithtargs.nii','compressed',true);
