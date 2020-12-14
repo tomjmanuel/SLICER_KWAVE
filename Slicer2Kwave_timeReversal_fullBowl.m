@@ -10,7 +10,7 @@
 clear all
 %% define inputs
 % .mat output holding pressure at sensor (vectorized)
-fnout = 'patsesnsor_050test.mat';
+fnout = 'patsesnsor_Emel_fullbowl.mat';
 
 % ct filename 
 % CT that has been cropped and co-registered to xdcr mask in slicer
@@ -30,7 +30,7 @@ Amp = 1000;                % amplitude at source.p_mask
 % amount to steer (axial dim is third dim)
 axialsteer =  0;    %[m] negative steers towards xdcr, positive away
 latsteer1   = 0;        %[m] lat steering in first dimension
-latsteer2   = 5E-3;        %[m] lat steering in second dimension
+latsteer2   = 0; %5E-3;        %[m] lat steering in second dimension
 
 %% load data and set final sim size (to include padding for pml & fft efficiency)
 ct.data = niftiread(ctfn);
@@ -83,15 +83,12 @@ end
 
 medium = getAcousticProperties(ct.data);
 
-% %% test in water 
-% medium.density = 997.*ones(dim);
-% medium.sound_speed = 1480.*ones(dim);
 
 %% test in water
-foo = [];
-foo.sound_speed = 1480.*ones(dim);
-foo.density = 997.*ones(dim);
-medium = foo;
+% foo = [];
+% foo.sound_speed = 1480.*ones(dim);
+% foo.density = 997.*ones(dim);
+% medium = foo;
 
 %% create kgrid
 vox = 1E-3.*ct.info.PixelDimensions;
@@ -130,7 +127,10 @@ source.p_mask(focus_pos(1),focus_pos(2),focus_pos(3))=1;
 
 
 %% setup sensor
-sensor.mask = Egrid;
+% old code just used Egrid
+% sensor.mask = Egrid;
+% here use bowls from xdcr 
+sensor.mask = xdcr==1;
 sensor.record = {'p'};    
 
 sensor_data = kspaceFirstOrder3DG(kgrid,medium,source,sensor);

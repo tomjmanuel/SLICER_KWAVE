@@ -1,7 +1,7 @@
 %% load in data from Slicer2Kwave_timeReversal.m
 clear all
 load('patsesnsor_050test.mat')
-
+%%
 % point at the nifti with labeled elements
 fnlabeledxdcr = 'IGT_labeled.nii.gz';
 
@@ -22,8 +22,8 @@ plot(sensor_data.p(10:10:end,:)')
 
 %% a few inputs to set
 freq = f0; %0.5E6; %[MHz] should load in with other sensor_data
-t0 = 700; % beginning time to calc phase
-te = 1500; % end time to calc phase
+t0 = 1500; % beginning time to calc phase
+te = 3000; % end time to calc phase
 Amp = 10000;
 
 %%
@@ -43,26 +43,26 @@ phase = angle(foo);
 Amps = abs(foo);
 
 %% make a pvec for each element
-Ncyc = 10;
-t = kgrid.t_array;
-dt = kgrid.dt;
-nptspulse= round( Ncyc * 1 / (dt*freq) ); % npts in our pulse
-tp = dt.*(1:1:nptspulse); % time vector for pulse
-
-Ne = length(Amps);
-win = gausswin(nptspulse); %guassian window
-pvec = zeros([Ne length(t)]);
-
-
-
-for i=1:Ne
-
-
-    pulse = Amp.*sin(2*pi*freq*tp+phase(i)); %pure ncycle sin wave
-    pvec(i,1:nptspulse)=pulse.*win';
-
-   
-end
+% Ncyc = 10;
+% t = kgrid.t_array;
+% dt = kgrid.dt;
+% nptspulse= round( Ncyc * 1 / (dt*freq) ); % npts in our pulse
+% tp = dt.*(1:1:nptspulse); % time vector for pulse
+% 
+% Ne = length(Amps);
+% win = gausswin(nptspulse); %guassian window
+% pvec = zeros([Ne length(t)]);
+% 
+% 
+% 
+% for i=1:Ne
+% 
+% 
+%     pulse = Amp.*sin(2*pi*freq*tp+phase(i)); %pure ncycle sin wave
+%     pvec(i,1:nptspulse)=pulse.*win';
+% 
+%    
+% end
 
 %% get mask and labels from niftis
 %[source.p_mask, labels] = makeMultiBowl(dim, [xx, yy, zz], radius, diameter, [focus_pos(1) focus_pos(2) focus_pos(3)], 'RemoveOverlap',true);
@@ -96,6 +96,19 @@ source.p_mask = xdcr;
 % 
 labels = labels(:);
 labels(labels==0)=[];
+%%
+% make a pvec for each element
+Ncyc = 10;
+t = kgrid.t_array;
+dt = kgrid.dt;
+nptspulse= round( Ncyc * 1 / (dt*freq) ); % npts in our pulse
+tp = dt.*(1:1:nptspulse); % time vector for pulse
+
+Ne = length(Amps);
+win = gausswin(nptspulse); %guassian window
+pvec = zeros([Ne length(t)]);
+
+
 
 source.p = zeros([length(labels), size(pvec,2)]);
 phaseFinal = zeros([size(pvec,1) 1]);
@@ -104,14 +117,33 @@ for i = 1 : Ne
     % labels ==1 needs phase from sensor point where orderV ==i
     % this grabs index where orderV ==i
     [~,ind] = min((orderV-i).^2);
+    
+    % first grab all phases from a given element
+    % vectorized labels corresponds directly to vectorized phase
+    pElem = phase(labels==i);
+    
+    % now create a pvec with that phase
+    pulse = Amp.*sin(2*pi*freq*tp+mean(pElem)); %pure ncycle sin wave
+    pvec(i,1:nptspulse)=pulse.*win';
+    
+    % old code used pvec(ind,:) bc pvec was created in 
+    source.p(labels == i, :) = repmat(pvec(i,:), [sum(labels == i), 1]);
+    
     % this is the phase for performing kWave based abberation correction
-    phaseFinal(i) = phase(ind);
-    IGT_phaseReorder_indeces(i)=ind; % use to reorder HAS phases
-    source.p(labels == i, :) = repmat(pvec(ind,:), [sum(labels == i), 1]);
+    %phaseFinal(i) = phase(ind); % use phaseFinal for kWave based correction
+    %IGT_phaseReorder_indeces(i)=ind; % use to reorder HAS phases (didn't work)
 end
 
+% put phases in order for use with IGT
+for i=1:Ne
+    % where in the original order is i
+    [~,ind] = min((orderV-i).^2);
+    % what is the mean phase of that elemennt
+    pElem = phase(labels==i);
+    % store that phase at the original order
+    phaseFinal(ind) = mean(pElem);
 
-
+end
 %% run simulation
 
 sensor.mask=ones(size(kgrid.x));
