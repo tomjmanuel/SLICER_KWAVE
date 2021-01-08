@@ -8,6 +8,8 @@ clear all
 load('IGTelemLocs.mat');
 
 A = elemLocs;
+% pcds (elem x (xyz))
+P = [[36.4 0 62.1100]; [0 36.4 62.1100]; [-36.4 0 62.1100]; [0 -36.4 62.1100]];
 
 % 20201207, changed elemlocs to match native coordinates (z mirrored)
 %
@@ -40,11 +42,18 @@ A(:,1) = A(:,1)+fL(1);
 A(:,2) = A(:,2)+fL(2);
 A = round(A);
 
+% shift P
+P = P.*usf;
+P(:,1) = P(:,1) + fL(1);
+P(:,2) = P(:,2)+fL(2);
+P = round(P);
+
 %% shift axially
 % focus is axially located at 1 right now
 % shift it up by the padding/2 + padding extraz
 fL(3)=padding/2+zpaddingextra;
 A(:,3)=A(:,3)+padding/2+zpaddingextra;
+P(:,3)=P(:,3)+padding/2+zpaddingextra;
 
 %D(3) should equal the max of the xdcr (top of cap) +padding/2
 D(3)=max(A(:,3))+padding/2;
@@ -108,6 +117,7 @@ niftiwrite(bowls_with500,'IGTwithtargs.nii','compressed',true);
 % outputs
 % pixel coordinates to be used with timereversal
 save('IGT_pixcoords.mat','A');
+save('IGT_pixcoords_pcds.mat','P');
 % labeled bowls
 niftiwrite(labels,'IGT_labeled.nii','compressed',true);
 % map with all sensor points marked 1, and focus labeled as 255, with
