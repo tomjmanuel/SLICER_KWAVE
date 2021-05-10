@@ -33,7 +33,7 @@ function [arfi, info, magIm] = nii2MRARFI_two(fni, gradStrength, MEGdur, pos_onl
     % 
     data = [];
     for ii = 1:2:3
-        [data(:,:,:,ii:ii+1),info] = load_data_mix(fni{1,(ii+1)/2});
+        [data(:,:,:,ii:ii+1),info] = load_data(fni{1,(ii+1)/2});
     end
     
     

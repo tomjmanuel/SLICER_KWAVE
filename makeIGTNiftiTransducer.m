@@ -65,7 +65,7 @@ D(3)=max(A(:,3))+padding/2;
 
 %% mark focus in bowls (not running this section to make nifti with targets
 % make grid big enough to encomposs focus + padding
-bs=5; % size of spot at focus
+bs=3; % size of spot at focus
 bowls(fL(1)-bs:fL(1)+bs,fL(2)-bs:fL(2)+bs,fL(3)-bs:fL(3)+bs)=200;
 bowls(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 
@@ -80,35 +80,39 @@ bowls(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 % 500, 090, 00-8
 bowls_with500 = bowls;
 
-%mark 500
+%mark 50n5
 dx = 1E-3/usf;
 fivemmpx = round(5E-3/dx);
 loc500 = fL;
 loc500(1) = loc500(1)+fivemmpx;
+loc500(3) = loc500(3)-fivemmpx;
 
 bs = 2;
 bowls_with500(loc500(1)-bs:loc500(1)+bs,loc500(2)-bs:loc500(2)+bs,loc500(3)-bs:loc500(3)+bs)=200;
 % write out bowls with 500 marked
 
-%mark 090
-fivemmpx = round(9E-3/dx);
+%mark 05n5
+fivemmpx = round(5E-3/dx);
 loc500 = fL;
 loc500(2) = loc500(2)+fivemmpx;
+loc500(3) = loc500(3)-fivemmpx;
 bs = 2;
 bowls_with500(loc500(1)-bs:loc500(1)+bs,loc500(2)-bs:loc500(2)+bs,loc500(3)-bs:loc500(3)+bs)=200;
 
-%mark 00-8
-fivemmpx = round(8E-3/dx);
+%mark 00-5
+fivemmpx = round(5E-3/dx);
 loc500 = fL;
 loc500(3) = loc500(3)-fivemmpx;
 bs = 3;
 bowls_with500(loc500(1)-bs:loc500(1)+bs,loc500(2)-bs:loc500(2)+bs,loc500(3)-bs:loc500(3)+bs)=200;
 
-% %mark 000
-% bs=1; % size of spot at focus
-% bowls_with500(fL(1)-bs:fL(1)+bs,fL(2)-bs:fL(2)+bs,fL(3)-bs:fL(3)+bs)=200;
-% bowls_with500(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
-
+% %mark 10 0n3
+fivemmpx = round(5E-3/dx);
+threpx = round(3E-3/dx);
+loc500 = fL;
+loc500(1) = loc500(1)+2*fivemmpx;
+loc500(3) = loc500(3)-threpx;
+bowls_with500(loc500(1)-bs:loc500(1)+bs,loc500(2)-bs:loc500(2)+bs,loc500(3)-bs:loc500(3)+bs)=200;
 
 niftiwrite(bowls_with500,'IGTwithtargs.nii','compressed',true);
 

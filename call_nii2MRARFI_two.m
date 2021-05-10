@@ -19,7 +19,7 @@
 
 % sometimes we don't collect both directions if image is good enough
 % if only collecting positive use this
-pos_only = 1;
+pos_only = 0;
 
 % load the scan with positive motion-encoding gradients (MEG)
 [file, path] = uigetfile('*.nii','Select Arfi magnitude +grad .nii file');
@@ -43,11 +43,12 @@ fno = strcat(path,file(1:end-4),'_arfi.nii');
 % call function (it writes out a nifti, nothing is returned)
 % 3rd slice
 gradStrength = 40; %mT/m
+
 MEGdur = 8; %ms
 [arfi, info, magIm] = nii2MRARFI_two(fni,MEGdur,gradStrength,pos_only);
 magIm = magIm(:,:,:,1);
 %% permute arfi if smallest dimension isn't last
-sliceDim = 2;   % set this variable to hold slice dimension
+sliceDim = 3;   % set this variable to hold slice dimension
                 % for instance, if dim(arfi) = 160x5x160, sliceDim=2
                 % if dim(arfi) = 160x160x5, sliceDim = 3
 
@@ -67,7 +68,7 @@ end
 % This portion of the code was written by Sumeeth
 % it subtracts background phase...
 % make sure to click a region in the brain or phantom but not at the focus
-sliceOfInterest = 4; % set this to be the slice you want to choose region in
+sliceOfInterest = 2; % set this to be the slice you want to choose region in
 figure
 imagesc(-arfi(:,:,sliceOfInterest),[-1 1])
 title('click on region to use for phase background')
@@ -82,15 +83,15 @@ for i = 1 : nSlice % subtract out background phase from a circular ROI ("mask") 
 end
 close all
 %% run this to pull up imtool and scale contrast
-imtool(arfi(:,:,8),'InitialMagnification','fit');
+imtool(arfi(:,:,sliceOfInterest),'InitialMagnification','fit');
 %% next rescale intensity values using imtool for better contrast
 % click the black and white circle in the imtool window
 % use the vertical bars in the histogram to adjust contrast
 % using max and min in the imtool window section, write those down here
 % at the end of this section, foo should have values from 0 to 1
 close all
-mm = -.4;
-MM = 3.5;
+mm = 0.;
+MM = 1.5;
 % scale the image such that mm goes to zero and MM goes to 1
 foo = arfi;
 foo = foo-mm; %mm values become zero with this shift, MM become MM-mm

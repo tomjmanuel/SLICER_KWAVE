@@ -6,13 +6,13 @@
 %   voxel sizes
 
 clear all
-load('scanskull.mat');
+load('manysmall_elemlocs.mat');
 
-radius_mm = 72;
-diameter_mm = 1; %element diameter not transducer diameter
-nE = 693; % n elements
+radius_mm = 150;
+diameter_mm = 12; %element diameter not transducer diameter
+nE = 128; % n elements
 
-usf = 5; % grid usf
+usf = 2; % grid usf
 padding = 30; % padding in all 3 dim
 zpaddingextra = 30; % optional extra z padding
 
@@ -47,11 +47,11 @@ bs=5; % size of spot at focus
 bowls(fL(1)-bs:fL(1)+bs,fL(2)-bs:fL(2)+bs,fL(3)-bs:fL(3)+bs)=200;
 bowls(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 
-% outputs
+%% outputs
 % pixel coordinates to be used with timereversal
-save('skullscanpixcoords.mat','A');
+save('healdream3_pixcoords.mat','A');
 % labeled bowls
-%niftiwrite(labels,'IUS_labeled.nii','compressed',true);
+%niftiwrite(labels,'ISTU_labeled.nii','compressed',true);
 % map with all sensor points marked 1, and focus labeled as 255, with
 % surrounding voxels labeled 200
-niftiwrite(bowls,'skullscan.nii','compressed',true);
+niftiwrite(bowls,'healdream3.nii','compressed',true);
