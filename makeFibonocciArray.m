@@ -1,66 +1,44 @@
 % https://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere
 % https://www.sciencedirect.com/science/article/abs/pii/0025556479900804?via%3Dihub
 
-%% 3d
-clear all
-close all
-% define spherical cap
-R = 150; %mm
-D = 260; %mm
-fn = R/D; % fnumber
-h = sqrt(R^2 - (D/2)^2); % height of base of spherical cap
+%% create a fibonocci spiral array
+R = 72;     %ROC (mm)
+D = 110;    %Diam (mm)
+nE = 128;   % # of elements
+fnout = 'compareRS_afp.mat';
 
+h = sqrt(R^2 - (D/2)^2);        % height of base of spherical cap
+Acap = 2*pi*R*h;
+Asphere = 4*pi*(R^2);
+rat = Asphere/Acap;
+npts = round(nE*rat*.95);     %npts is how many points go on the sphere, will increment up
+nCap = 0;                        %holds how many points fall on spherical cap
+
+while (nCap<nE)
+    npts = npts+1;
     
-elemSpace = 25.9; %distance between elements [mm]
-
-flag = 0; % flag goes to one when elements are maximally packed
-npts = 300; % n points to put on the sphere (starting number)
- 
-while ~flag
-
+    %generate points on the sphere
     [x,y,z] = getFibSphere(npts);
     x = x.*R; y = y.*R; z = z.*R;
     % crop out points that aren't on the spherical cap
     zz = z(z>h); xx = x(z>h); yy = y(z>h);
-    scatter3(xx,yy,zz)
-    axis equal
+    nCap = length(zz);
     
-    space = getSpacing(xx,yy,zz);
-    if space>elemSpace
-        npts = npts+1;
-    else
-        %the maximum # of points has been found
-        npts = npts-1;
-        [x,y,z] = getFibSphere(npts);
-        x = x.*R; y = y.*R; z = z.*R;
-        % crop out points that aren't on the spherical cap
-        zz = z(z>h); xx = x(z>h); yy = y(z>h);
-        flag=1;
-        'n elem: '
-        length(zz)
-        
-    end
 end
+
+if (nCap~=nE)
+    'nCap ~= nE'
+    nCap
+end
+
+
+% save
+zz = -1.*zz+max(zz);
 scatter3(xx,yy,zz)
 axis equal
-
-%% save
-zz = -1.*zz+max(zz);
 A = [xx' yy' zz'];
-save('fewsmall_elemLocs.mat','A');
+save(fnout,'A');
 
-%% 2d (sunflower packing)
-close all
-n = 500;
-indices = (0:n-1) +.5;
-r = sqrt(indices/n);
-
-theta = pi * (1 + sqrt(5)) * indices;
-
-cosd(theta)
-
-scatter(r.*cos(theta),r.*sin(theta))
-axis equal 
 %% functions to call
 
 function [space] = getSpacing(xx,yy,zz)

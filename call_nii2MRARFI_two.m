@@ -19,7 +19,7 @@
 
 % sometimes we don't collect both directions if image is good enough
 % if only collecting positive use this
-pos_only = 0;
+pos_only = 1;
 
 % load the scan with positive motion-encoding gradients (MEG)
 [file, path] = uigetfile('*.nii','Select Arfi magnitude +grad .nii file');
@@ -44,7 +44,7 @@ fno = strcat(path,file(1:end-4),'_arfi.nii');
 % 3rd slice
 gradStrength = 40; %mT/m
 
-MEGdur = 8; %ms
+MEGdur = 4; %ms
 [arfi, info, magIm] = nii2MRARFI_two(fni,MEGdur,gradStrength,pos_only);
 magIm = magIm(:,:,:,1);
 %% permute arfi if smallest dimension isn't last
@@ -68,7 +68,7 @@ end
 % This portion of the code was written by Sumeeth
 % it subtracts background phase...
 % make sure to click a region in the brain or phantom but not at the focus
-sliceOfInterest = 2; % set this to be the slice you want to choose region in
+sliceOfInterest = 3; % set this to be the slice you want to choose region in
 figure
 imagesc(-arfi(:,:,sliceOfInterest),[-1 1])
 title('click on region to use for phase background')

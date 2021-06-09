@@ -6,13 +6,13 @@
 %   voxel sizes
 
 clear all
-load('manysmall_elemlocs.mat');
+load('golden_elem_locs.mat');
 
-radius_mm = 150;
-diameter_mm = 12; %element diameter not transducer diameter
+radius_mm = 53;
+diameter_mm = 3.5; %element diameter not transducer diameter
 nE = 128; % n elements
 
-usf = 2; % grid usf
+usf = 4; % grid usf
 padding = 30; % padding in all 3 dim
 zpaddingextra = 30; % optional extra z padding
 
@@ -49,9 +49,9 @@ bowls(fL(1),fL(2),fL(3))=255; % mark the exact focus voxel as 255
 
 %% outputs
 % pixel coordinates to be used with timereversal
-save('healdream3_pixcoords.mat','A');
+save('ATAC_pixcoords.mat','A');
 % labeled bowls
-%niftiwrite(labels,'ISTU_labeled.nii','compressed',true);
+niftiwrite(labels,'ATAC_labeled.nii','compressed',true);
 % map with all sensor points marked 1, and focus labeled as 255, with
 % surrounding voxels labeled 200
-niftiwrite(bowls,'healdream3.nii','compressed',true);
+niftiwrite(bowls,'ATAC.nii','compressed',true);
