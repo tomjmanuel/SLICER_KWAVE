@@ -17,7 +17,7 @@ radius_mm = 72;
 diameter_mm = 6.6; %element diameter not transducer diameter
 nE = 128; % n elements
 
-usf = 4; % grid usf
+usf = 5; % grid usf
 padding = 30; % padding in all 3 dim
 zpaddingextra = 30; % optional extra z padding
 

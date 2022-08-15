@@ -19,7 +19,7 @@
 
 % sometimes we don't collect both directions if image is good enough
 % if only collecting positive use this
-pos_only = 1;
+pos_only = 0;
 
 % load the scan with positive motion-encoding gradients (MEG)
 [file, path] = uigetfile('*.nii','Select Arfi magnitude +grad .nii file');
@@ -44,7 +44,7 @@ fno = strcat(path,file(1:end-4),'_arfi.nii');
 % 3rd slice
 gradStrength = 40; %mT/m
 
-MEGdur = 4; %ms
+MEGdur = 8; %ms
 [arfi, info, magIm] = nii2MRARFI_two(fni,MEGdur,gradStrength,pos_only);
 magIm = magIm(:,:,:,1);
 %% permute arfi if smallest dimension isn't last
@@ -82,16 +82,18 @@ for i = 1 : nSlice % subtract out background phase from a circular ROI ("mask") 
     arfi(:,:,i) = tmp1 - mean(tmp1(mask));
 end
 close all
+ arfi = -arfi;
 %% run this to pull up imtool and scale contrast
-imtool(arfi(:,:,sliceOfInterest),'InitialMagnification','fit');
+imtool(arfi(:,:,3),'InitialMagnification','fit');
 %% next rescale intensity values using imtool for better contrast
 % click the black and white circle in the imtool window
 % use the vertical bars in the histogram to adjust contrast
 % using max and min in the imtool window section, write those down here
 % at the end of this section, foo should have values from 0 to 1
 close all
-mm = 0.;
-MM = 1.5;
+imtool('close', 'all')
+mm = 0;
+MM = 0.7;
 % scale the image such that mm goes to zero and MM goes to 1
 foo = arfi;
 foo = foo-mm; %mm values become zero with this shift, MM become MM-mm
@@ -104,7 +106,7 @@ imagesc(foo(:,:,sliceOfInterest))
 magIm = magIm- min(magIm(:)); % scale 0 to 1
 magIm = magIm./max(magIm(:));
 %%
-maskVal = .05; % 0 to 1
+maskVal = .04; % 0 to 1
 mask = magIm>maskVal;
 %mask = repmat(mask,[1,1,nSlice]); % replicate mask through all slices
 foo2 = foo.*mask; % apply mask
@@ -122,7 +124,7 @@ if perm_flag
         arfi = permute(arfi,[2,3,1]);
     end
 end
-
+close all
 %% sometimes info.Imagesize has a fourth dimension
 dim = size(arfi);
 vox = info.PixelDimensions(1:3);

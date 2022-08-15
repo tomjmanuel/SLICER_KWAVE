@@ -2,10 +2,10 @@
 % https://www.sciencedirect.com/science/article/abs/pii/0025556479900804?via%3Dihub
 
 %% create a fibonocci spiral array
-R = 72;     %ROC (mm)
-D = 110;    %Diam (mm)
-nE = 128;   % # of elements
-fnout = 'compareRS_afp.mat';
+R = 55;     %ROC (mm)
+D = 109;    %Diam (mm)
+nE = 335;   % # of elements
+fnout = 'skullscan2.mat';
 
 h = sqrt(R^2 - (D/2)^2);        % height of base of spherical cap
 Acap = 2*pi*R*h;
